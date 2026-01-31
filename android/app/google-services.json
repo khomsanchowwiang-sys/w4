@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "454093952027",
+    "project_id": "w4-khomsan03",
+    "storage_bucket": "w4-khomsan03.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:454093952027:android:58e1cf416cd9bfb3a454be",
+        "android_client_info": {
+          "package_name": "com.example.w4khomsan"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAy2Xr7TMHfkgvTgk7q2bDW7V4Uv3dxwV4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
