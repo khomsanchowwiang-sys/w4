@@ -131,6 +131,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 return Center(child: Text(snapshot.error.toString()),);
               }
               //ถ้าสำเร็จก็ดึงข้อมูลมาทั้งหมด docs
+              //บรรทัดนี้คือการไปดึง "เอกสารทั้งหมด" ใน Collection "songs" ออกมาจาก Firebase แล้วเก็บไว้ในตัวแปรชื่อ docs (เป็น List รายการยาวๆ)
               final docs = snapshot.data!.docs;
               //เเกรนหลักคือเเนวตั้ง Colum  (main)
               //เเกรนขวางคือเเนวนอน row (Cross)
@@ -139,17 +140,20 @@ class _MyHomePageState extends State<MyHomePage> {
               return GridView.builder(
                   //เพิ่มitemCount กัน error
                 itemCount: docs.length,
+                  //ตัวกำหนดโครงสร้างตาราง แบบล็อคจำนวนแถว"
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                    //จำนวนที่จะเเสดงต่อเเุถว
                   crossAxisCount: 3,
 
                       //ขนาดกรอบ
                     crossAxisSpacing: 10,
-                      //ระยะห่าง
+                      //ระยะห่าง m
                     mainAxisSpacing: 30
                    ),
                   itemBuilder: (context, index){
+                    //ใน GridView หรือ ListView มันจะวนลูปสร้างของทีละชิ้นตามลำดับ (index) บรรทัดนี้คือการสั่งว่า "ให้ไปหยิบเอกสารลำดับที่ index ออกมาจาก docs" แล้วเอามาพักไว้ในตัวแปรชื่อ songs
                     final songs =  docs[index];
+                    //คำสั่ง final s = songs.data(); มาจากตัวแปร songs ที่บรรทัดก่อนหน้า
                     final s = songs.data();
                     //InkWell ครอบ UI ตัวไหนก็ได้ สามารถคลิกได้ เเล้วสามารถไปเรียกฟังชั่นอื่นได้
                     return InkWell(
