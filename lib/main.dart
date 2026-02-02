@@ -43,15 +43,16 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
 
   //Ctrl เก็บค่าทุกอย่าง
+  //เอาไว้ดึงข้อความที่พิมพ์ หรือสั่งลบข้อความในช่องนั้น
   final _songNameCtrl = TextEditingController();
   final _nameCtrl = TextEditingController();
   final _songTypeCtrl = TextEditingController();
 
 
   //เรียกใช้ตอนกดปุ่ม
-  //Voide ตือ ไม่คืนค่า
+  //ฟังก์ชันบันทึกข้อมูล (Add Song)
   void addSong() async {
-    //.text คืิอดึงค่าที่เรากรอก ไว้ใน String
+    // 1. ดึงข้อความจาก Controller มาแปลงเป็น String เก็บไว้ในตัวแปร
     String _songname = _songNameCtrl.text;
     String _name = _nameCtrl.text;
     String _songtype = _songTypeCtrl.text;
@@ -62,10 +63,12 @@ class _MyHomePageState extends State<MyHomePage> {
 //  try พยยาม
     //ให้บันทึกลงไปใน Store
     try {
-      //รอ
-      //collection("songs")  ดึงค่า สำคัญ
+      // 2. เริ่มกระบวนการบันทึก (ใช้ await เพื่อรอให้เสร็จ)
+      // FirebaseFirestore.instance : เรียกตัวจัดการฐานข้อมูล
+      // .collection("songs") : ชี้ไปที่โฟลเดอร์เก็บข้อมูลชื่อ "songs"
+      // .add(...) : สร้างเอกสารใหม่ ใส่ข้อมูลลงไป
       await FirebaseFirestore.instance.collection("songs").add({
-
+        // โครงสร้างข้อมูลแบบ Key : Value
         //จับคู่
         "songname" : _songname,
         "artis" : _name,
@@ -78,6 +81,7 @@ class _MyHomePageState extends State<MyHomePage> {
       _songTypeCtrl.clear();
       //เออเร่อgเล้วจะไปโชว์ที่ Console
       //e คือตัวใดตัวเเปรหนึง
+      //// 4. ถ้ามี error (เช่น เน็ตหลุด) ให้แสดงข้อความ error ใน Console
     } catch (e) {
       print("เกิดข้อผิดพลาด : $e");
     }
@@ -94,21 +98,24 @@ class _MyHomePageState extends State<MyHomePage> {
       // เพิ่ม Padding รอบๆ Body ไม่ให้ติดขอบจอ
       body: Padding(
         padding: const EdgeInsets.all(16.0),
+        // เรียงเนื้อหาจากบนลงล่าง
         child: Column(children: [
 
           //จีับคุ๋ กะCrtl
           // เพิ่มกรอบและไอคอนให้สวยงาม
+          //  ช่องกรอกข้อมูล (TextField)
           TextField(
             decoration: InputDecoration(
               labelText: "ชื่อเพลง",
               border: OutlineInputBorder(), // ใส่กรอบ
               prefixIcon: Icon(Icons.music_note), // ใส่ไอคอน
-              isDense: true, // ทำให้ช่องกระชับขึ้น
+              isDense: true, // ทำให้ช่องกระชับขึ้น // บีบช่องให้เล็กลงหน่อย
             ),
             controller: _songNameCtrl,
 
           ),
           const SizedBox(height: 10), // เว้นระยะห่าง
+
           TextField(
             decoration: InputDecoration(
               labelText: "ชื่อศิลปิน",
@@ -132,10 +139,11 @@ class _MyHomePageState extends State<MyHomePage> {
           const SizedBox(height: 15), // เว้นระยะห่างปุ่ม
 
           // ขยายปุ่มให้เต็มความกว้าง
+          //ปุ่มบันทึก
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon( // เปลี่ยนเป็น ElevatedButton.icon เพื่อใส่ไอคอน
-              onPressed: addSong,
+              onPressed: addSong,// เมื่อกด ให้เรียกฟังก์ชัน addSong ทำงาน
               icon: Icon(Icons.save),
               label: Text("บันทึกข้อมูล"),
               style: ElevatedButton.styleFrom(
@@ -146,7 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
 
           const SizedBox(height: 20), // เว้นระยะห่างก่อนเริ่มรายการ
-
+          // ส่วนแสดงรายการแบบ Real-time (StreamBuilder)
           Expanded(child:
           StreamBuilder(
 
@@ -155,6 +163,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
               //เเสดงผลออกมา
               builder: (context, snapshot){
+
+                // เช็คสถานะ: ถ้ากำลังโหลด ให้หมุนติ้วๆ
                 if(snapshot.connectionState == ConnectionState.waiting){
                   return Center(child: CircularProgressIndicator(),);
 
@@ -165,7 +175,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   //ส่งไปยัง snapshot เป็นเป็น to string
                   return Center(child: Text(snapshot.error.toString()),);
                 }
-                //ถ้าสำเร็จก็ดึงข้อมูลมาทั้งหมด docs
+                // ถ้าข้อมูลมาแล้ว ดึงรายการทั้งหมดเก็บใส่ตัวแปร docs
                 //บรรทัดนี้คือการไปดึง "เอกสารทั้งหมด" ใน Collection "songs" ออกมาจาก Firebase แล้วเก็บไว้ในตัวแปรชื่อ docs (เป็น List รายการยาวๆ)
                 final docs = snapshot.data!.docs;
                 //เเกรนหลักคือเเนวตั้ง Colum  (main)
@@ -186,9 +196,9 @@ class _MyHomePageState extends State<MyHomePage> {
                         mainAxisSpacing: 10 // ปรับให้ชิดขึ้นนิดนึงให้สวยงาม (ของเดิม 30)
                     ),
                     itemBuilder: (context, index){
-                      //ใน GridView หรือ ListView มันจะวนลูปสร้างของทีละชิ้นตามลำดับ (index) บรรทัดนี้คือการสั่งว่า "ให้ไปหยิบเอกสารลำดับที่ index ออกมาจาก docs" แล้วเอามาพักไว้ในตัวแปรชื่อ songs
+                      // ดึงข้อมูลทีละตัวตามลำดับ (index)
                       final songs =  docs[index];
-                      //คำสั่ง final s = songs.data(); มาจากตัวแปร songs ที่บรรทัดก่อนหน้า
+                      // แปลงเป็นข้อมูลดิบ (Map)แปลงข้อมูลนั้นให้อยู่ในรูปแบบ Map หรือ Key-Value ครับ พอแปลงเสร็จแล้ว เราก็จะสามารถเข้าถึงข้อมูลเนื้อหาจริงๆ เช่น ชื่อเพลง หรือ ชื่อศิลปิน ได้โดยตรงครับ"
                       final s = songs.data();
                       //InkWell ครอบ UI ตัวไหนก็ได้ สามารถคลิกได้ เเล้วสามารถไปเรียกฟังชั่นอื่นได้
                       return InkWell(
